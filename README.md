@@ -21,18 +21,25 @@ Hallways is a project to help people navigate the littered layout of the UT Dall
 - Choose/design an algorithm for updating the database based on passive user input.
 
 ### Getting the data:
+- Implement server logs.
 - Design the UI for collecting data.
 - Create database structure for storing signal strength to location data.
+- Create webserver for serving database.
 - Write database setting methods for collecting data.
 - Take data!
 - Find out error-tolerance (eg. how much does the signal change? how accurate is our reading?).
+- Write code that embeds maps (with labeled room numbers) of UTD buildings into the database
 
 ### Implementation of client:
-- Write code that embeds maps (with labeled room numbers) of UTD buildings into the database
-- Design an UI for displaying maps from the database.
-- Write the methods that implement our algorithm for matching signal strength to location
+- Design an UI
+    * Design UI for displaying maps
+    * Design UI for searching for places
+    * Design UI for reporting incorrect identifications
+- Write code that talks to the server.
+- Write the methods that implement our algorithm for matching signal strength to location.
 - Write the methods that implement our algorithm for updating the database.
 - Write the methods that allow users to open a certain type of location-link in our app.
+- Implement client logs and send crash-statistics to server.
 
 ### Maintenance and further improvement:
 - Write a user feedback form to improve our project.
@@ -42,7 +49,6 @@ Hallways is a project to help people navigate the littered layout of the UT Dall
 - [Navizon](https://www.navizon.com/), now called [Accuware](http://www.accuware.com/)
 - [Redpin](http://redpin.org/)
 - [Duke's UnLoc](http://today.duke.edu/2012/06/unloc)
-- [Google Scholar](https://scholar.google.com/scholar?q=indoor+positioning+wifi&hl=en&as_sdt=0&as_vis=1&oi=scholart&sa=X&ved=0CC8QgQMwAGoVChMI5dn4-_acyAIVyJINCh14BAU1)
-- [SO post 1](http://stackoverflow.com/questions/9726666/pinpointing-indoor-location-with-android-not-accurate-enough), [SO post 2](http://stackoverflow.com/questions/12098122/how-to-improve-accuracy-of-indoor-positioning) (take with grain of salt)
+- [PlaceLab](http://ntrg.cs.tcd.ie/undergrad/4ba2.05/group1/) is similar, but wants much wider coverage (being able to locate yourself anywhere) and less accuracy (10m - 30m).
 
 Contact us if you would like to join.

@@ -7,7 +7,7 @@
 ## Signal information:
 - RSSI is a measure of how much power is going through the antenna from a certain network [\[1\]][1].
 - Different manufacturers of network cards can make RSSI mean different things, not just a linear measure of dBm. Not even the bounds are consistent across all devices [\[2\]][2]. Note that the android developer documentation erroneously refers to the RSSI as the signal strength in dBm.
-- RCPI could be a better more consistent measure of signal strength, but the Android OS doesn't currently report this value in an API. ([Android Developer Site](http://developer.android.com/reference/android/net/wifi/ScanResult.html))
+- RCPI could be a better more consistent measure of signal strength, but the Android OS doesn't currently report this value in an API ([\[2\]][2], [Android Developer Site](http://developer.android.com/reference/android/net/wifi/ScanResult.html)).
 - The iPhone API doesn't let you get any information about networks in the area without the use of private libraries ([Stack Overflow post I](http://stackoverflow.com/questions/9684341/iphone-get-a-list-of-all-ssids-without-private-library), [Stack Overflow post II](http://stackoverflow.com/questions/10317028/find-available-wi-fi-networks)). On the other hand, the private library [Apple80211Functions](https://code.google.com/p/iphone-wireless/wiki/Apple80211Functions) exposes the access of RSSI, but not RCPI. Apps developed with private libraries are not permitted to be put on the app store.
 - Physical events can change signal strength with time such as [\[3\]][3]:
    * other moving things in the environment causing multipath
@@ -45,13 +45,25 @@
 - [\[4\] "Indoor Positioning using Sensor-fusion in Android Devices"][4] is all about combining multiple sensor streams to deduce location (including WiFi, GPS, Bluetooth, and inertial sensors). It offers many routines for cleaning up accelerometer data. It also offers information about the data-collection of RSSI networks. This is a complete system with good results. Very important to read.
 - [\[5\] "Improving Location Fingerprinting through Motion Detection and Asynchronous Interval Labeling"][5] is a complete system for tracking based on location fingerprinting. This means instead of putting WiFi measurement vectors on a continuum, it puts them in discrete locations and looks to see which one you are closest to. This simplifies the problem, however it is less accurate for large rooms like lecture halls or corridors.
 
-[1]: http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=5955283 "Differences in RSSI readings made by different Wi-Fi chipsets: A limitation of WLAN localization"
+## Redpin:
+- [Redpin](http://redpin.org/) is an "open source indoor positioning system" according to the project page. I hope to understand how the Redpin system works and draw inspiration from it.
+- In [org.redpin.server.standalone.locator.RedpinLocator](http://sourceforge.net/p/redpin/code/HEAD/tree/trunk/RedpinServer/src/org/redpin/server/standalone/locator/RedpinLocator.java) does an element-wise comparison of the signal strength fingerprints. I beleive this is the probabalistic measurement defined in their paper, [\[5\]][5].
+- In [org.redipin.server.standalone.locator.SVMLocator](http://sourceforge.net/p/redpin/code/HEAD/tree/trunk/RedpinServer/src/org/redpin/server/standalone/locator/SVMLocator.java) uses an external library for SVMs.
+- Of these two approaches, [LocatorHome](http://sourceforge.net/p/redpin/code/HEAD/tree/trunk/RedpinServer/src/org/redpin/server/standalone/locator/LocatorHome.java) seems to prefer SVMLocator.
+- The SVM is implemented using libsvm [here](http://sourceforge.net/p/redpin/code/HEAD/tree/trunk/RedpinServer/src/org/redpin/server/standalone/svm/SVMSupport.java)
+- Uses a JDBC on the server-side to store data. [example class](http://sourceforge.net/p/redpin/code/HEAD/tree/trunk/RedpinServer/src/org/redpin/server/standalone/db/homes/WiFiReadingHome.java#l38), [helper class](http://sourceforge.net/p/redpin/code/HEAD/tree/trunk/RedpinServer/src/org/redpin/server/standalone/db/homes/EntityHome.java).
+- 
+
+[1]: http://ieeexplore.ieee.org/xpl/articleDetails.jsp?tp=&arnumber=5955283 "Differences in RSSI readings1 made by different Wi-Fi chipsets: A limitation of WLAN localization"
 [2]: http://www.cdc.gov/niosh/mining/UserFiles/workshops/commtrack2009/NodeBasedTracking-Dubaniewicz.pdf "Node-Based Tracking Using Received Signal Strength Indication"
 [3]: https://www.wpi.edu/Pubs/E-project/Available/E-project-042811-163711/unrestricted/NRL_MQP_Final_Report.pdf "Software Defined Radio Localization Using 802.11-style Communications"
 [4]: http://hkr.diva-portal.org/smash/get/diva2:475619/FULLTEXT02.pdf "Indoor Positioning using Sensor-fusion in Android Devices"
 [5]: http://www.vs.inf.ethz.ch/publ/papers/bolliger-loca09.pdf "Improving Location Fingerprinting through Motion Detection and Asynchronous Interval Labeling"
 [6]: http://research.microsoft.com/en-us/groups/sn-res/infocom2000.pdf "RADAR: An In-Building RF-based User Location and Tracking System"
 
+[The creators of Place Lab, a location-enhanced mobile computing system, share lessons learned about leading the project and real-world deployment](https://homes.cs.washington.edu/~lamarca/pubs/IEEEPervasive.pdf)
+http://ieeexplore.ieee.org.libproxy.utdallas.edu/xpls/icp.jsp?arnumber=6682104
+http://ieeexplore.ieee.org.libproxy.utdallas.edu/xpls/icp.jsp?arnumber=7182561&tag=1
 http://www.csd.uoc.gr/~hy539/Assignments/presentations/practical_robust_localization.pdf
 http://www.cis.upenn.edu/~ahae/papers/mobicom2004.pdf
 http://ieeexplore.ieee.org.libproxy.utdallas.edu/xpls/icp.jsp?arnumber=5646681&tag=1

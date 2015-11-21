@@ -25,3 +25,5 @@
 - Try to make the codebase easy to understand. This doesn't just mean writing clean and commented code, although that helps. Moreso, this means designing the project such that each individual part is isolated. If a fly-by developer wants to help debug the UI, they don't have to sift through code that both processes data and displays the UI.
 
 - Unit-tests are a high priority. When a fly-by developer contributes code, manually finding introduced bugs is hard. Running a unit-test suite to automatically see if that contribution broke anything is easy.
+
+- Follow [Git Best Practices](https://sethrobertson.github.io/GitBestPractices/) and [Android best practices](https://github.com/futurice/android-best-practices)
