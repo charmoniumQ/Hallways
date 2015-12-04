@@ -11,39 +11,13 @@ Hallways is a project to help people navigate the littered layout of the UT Dall
 - Passively acquire user data (without sacrificing privacy) to improve results.
 - Allow users to write their location in a link and send it to other users who can open that location on a map.
 
-## Roadmap:
-### Design/research:
-- Understand the state-of-the-art indoor tracking systems.
-    * Understand the variance of 'signal strength' across different platforms.
-    * Understand what environmental factors change signal strength.
-    * Understand the algorithms for matching signal strength to location.
-- Choose/design an algorithm for matching signal strength to location (psuedocode).
-- Choose/design an algorithm for updating the database based on passive user input.
+## Contributing:
 
-### Getting the data:
-- Implement server logs.
-- Design the UI for collecting data.
-- Create database structure for storing signal strength to location data.
-- Create webserver for serving database.
-- Write database setting methods for collecting data.
-- Take data!
-- Find out error-tolerance (eg. how much does the signal change? how accurate is our reading?).
-- Write code that embeds maps (with labeled room numbers) of UTD buildings into the database
+If you want to help, please say so!
 
-### Implementation of client:
-- Design an UI
-    * Design UI for displaying maps
-    * Design UI for searching for places
-    * Design UI for reporting incorrect identifications
-- Write code that talks to the server.
-- Write the methods that implement our algorithm for matching signal strength to location.
-- Write the methods that implement our algorithm for updating the database.
-- Write the methods that allow users to open a certain type of location-link in our app.
-- Implement client logs and send crash-statistics to server.
-
-### Maintenance and further improvement:
-- Write a user feedback form to improve our project.
-- Port to multiple platforms.
+- We need Android/Java developers: [open java tasks](https://github.com/jachan/Hallways/issues?utf8=%E2%9C%93&q=label%3AJava%2FAndroid+is%3ATodo+is%3AOpen)
+- We need RubyOnRails/Server developers: [open ruby tasks](https://github.com/jachan/Hallways/issues?utf8=%E2%9C%93&q=label%3ARubyOnRails%2FServer+is%3ATodo+is%3AOpen)
+- We need machine learning and mathematics people to work out the algorithm [open math tasks](https://github.com/jachan/Hallways/issues?utf8=%E2%9C%93&q=label%3AMathematics%2FMachine-Learning+is%3ATodo+is%3AOpen+)
 
 ## Similar projects and related research:
 - [Navizon](https://www.navizon.com/), now called [Accuware](http://www.accuware.com/)
