@@ -1,6 +1,5 @@
+gem install rails
 rails new server --skip-test-unit --skip-javascript --api
-rails generate model Fingerprint bssid:string x:float y:float avg:float stddev:float n:integer
-rails generate controller api/v1/main upload download
+rails generate model Fingerprint bssid:string x:float y:float z:float avg:float stddev:float n:integer
 rake db:migrate
-password=`python -c 'from random import sample; from string import ascii_letters; print ("".join(sample(list(ascii_letters) + list(map(str, range(10))), 20)))'`
-echo "User.create(key: '$password')" | rails console
+rails generate controller api/v1/main upload download

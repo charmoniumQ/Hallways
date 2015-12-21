@@ -10,7 +10,7 @@ public class Field {
     /**
      * This class stores the data that goes into the field
      */
-    class FieldPoint {
+    public class FieldPoint {
 
     }
 
