@@ -1,1 +1,7 @@
-{"bssid":"bssid","x":0.5,"y":0.4,"avg":10.0,"stddev":1.0,"n":100}
+random text
+{"status":1,"error":"Invalid JSON format"}
+
+
+{"username": "main", "token": "2idJDnben6sigqOw48jbNKGAaWSJO6", "fingerprint": {
+  "x": "e", "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"
+}}

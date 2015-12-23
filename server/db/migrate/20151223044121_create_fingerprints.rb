@@ -4,6 +4,7 @@ class CreateFingerprints < ActiveRecord::Migration
       t.string :bssid
       t.float :x
       t.float :y
+      t.float :z
       t.float :avg
       t.float :stddev
       t.integer :n

@@ -1,5 +1,0 @@
-gem install rails
-rails new server --skip-test-unit --skip-javascript --api
-rails generate model Fingerprint bssid:string x:float y:float z:float avg:float stddev:float n:integer
-rake db:migrate
-rails generate controller api/v1/main upload download

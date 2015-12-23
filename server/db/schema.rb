@@ -11,12 +11,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20151124230903) do
+ActiveRecord::Schema.define(version: 20151223044131) do
 
   create_table "fingerprints", force: :cascade do |t|
     t.string   "bssid"
     t.float    "x"
     t.float    "y"
+    t.float    "z"
     t.float    "avg"
     t.float    "stddev"
     t.integer  "n"
@@ -25,9 +26,10 @@ ActiveRecord::Schema.define(version: 20151124230903) do
   end
 
   create_table "users", force: :cascade do |t|
-    t.string   "key"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "username"
+    t.string   "password_digest"
+    t.datetime "created_at",      null: false
+    t.datetime "updated_at",      null: false
   end
 
 end
