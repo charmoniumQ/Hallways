@@ -1,0 +1,6 @@
+import numpy as np
+from . import Location
+
+def locator(fingerprints, fields):
+    '''Estimates your location based on where the fields match your fingerprints'''
+    return Location(0, 0, 0)

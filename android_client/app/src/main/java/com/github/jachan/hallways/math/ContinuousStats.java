@@ -18,7 +18,7 @@ public class ContinuousStats {
 
     public void update(double xn) {
         ni++;
-        double n = ni;
+        double n = ni; // necessary since ni is int and n is double
         S = S + (n - 1) / n  * pow(xn - M, 2.0d); // here M refers to m_(i - 1)
         M = (n - 1) / n * M + xn / n;
     }

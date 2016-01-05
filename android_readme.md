@@ -42,3 +42,5 @@ The following classes are located in [Hallways/android/app/src/main/java/com/git
 - [WiFiUtility](https://github.com/jachan/Hallways/blob/master/android/app/src/main/java/com/github/jachan/hallways/WiFiUtility.java): Code for getting WiFi signal strengths
 
 Javadocs are offered for readability. They are periodically built.
+
+The Python client should always be one step ahead of the android client since it acts as a prototype
