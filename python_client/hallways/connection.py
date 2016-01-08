@@ -1,11 +1,22 @@
+import os
 import json
 import requests
 from .exceptions import HallwaysServerException
 
+DEFAULT_FILE = '../resources/private/password.txt'
 class Connection(object):
     '''Represents a connection to the Hallways server that you can input and output data'''
 
-    def __init__(self, url, username, token):
+    def __init__(self, url, username=None, password=None, file_name=None):
+        if not (username and password):
+            # if username and password not supplied, try the file
+            if not file_name and not os.getcwd().endswith('python_client'):
+                # if file not supplied and not in the right directory to get the default file
+                raise ValueError('If no file is passed, you must run this from project_root/python_client and project_root/resources/private/password.txt must be filled')
+            else:
+                file_name = DEFAULT_FILE
+            with open(file_name, 'r') as fileobj:
+                username, password = fileobj.readlines()[0].split(' ')
         self._username = username
         self._token = token
         self._url = url

@@ -15,6 +15,3 @@
 /log/*
 !/log/.keep
 /tmp
-
-# Ignore sensitive information like passwords
-/secure/*

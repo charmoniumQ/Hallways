@@ -1,0 +1,2 @@
+# Ignore sensitive information like passwords
+/secure/*
