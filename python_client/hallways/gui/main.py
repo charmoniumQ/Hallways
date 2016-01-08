@@ -6,6 +6,7 @@ from PyQt5.QtGui import *
 from .skeleton import Skeleton
 from ..wifi import WiFiScanner
 from ..location import Location
+from ..connection import Connection
 
 interface = 'wlp3s0'
 delay = 5
@@ -15,6 +16,7 @@ class Main(Skeleton):
         self._scanner = WiFiScanner(interface, delay)
         self._input_point = np.array([])
         self.set_enable_record(False)
+        self._c = Connection()
 
     def record_state_changed(self, record):
         '''Called whenever "Record data" button is toggled (override in subclass)
@@ -32,7 +34,7 @@ class Main(Skeleton):
                 self.set_enable_point(False)
             else:
                 self._data = self._scanner.stop_scanning()
-                print([f.summarize() for _, f in self._data.items()])
+                self._c.upload(self._data.values())
                 self._input_point = np.array([])
 
                 # UI changes

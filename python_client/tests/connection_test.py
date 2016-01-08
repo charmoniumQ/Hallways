@@ -5,13 +5,18 @@ from hallways import Fingerprint, Location
 from hallways import Connection
 
 class TestContinuousStats(unittest.TestCase):
-    def setUp(self):
-        with open('../rails_server/secure/password.txt', 'r') as f:
-            self.username, self.password = f.readlines()[0].split(' ')
-
     def test_connection(self):
-        c = Connection('http://localhost:3000/', self.username, self.password)
+        c = Connection('http://localhost:3000/')
         c.download()
-        f = Fingerprint('test', Location(0, 0, 1))
-        f.update(0)
-        c.upload(f)
+
+        f1 = Fingerprint('test', Location(0, 41, 21))
+        f1.update(2.1)
+        f1.update(1.9)
+        f1.update(2.3)
+
+        f2 = Fingerprint('test2', Location(0, 35, 23))
+        f2.update(20.4)
+        f2.update(20.1)
+        f2.update(19)
+
+        c.upload([f1, f2])

@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
 from .visual_map import VisualMap
 
-image = r'../UTDMapsPNG/Engineering and Computer Science South/ECSS4.png'
+image = r'../resources/maps/Engineering and Computer Science South/ECSS4.png'
 
 class Skeleton(QWidget):
     '''Barebons skeleton of the application (interface without functionality)'''

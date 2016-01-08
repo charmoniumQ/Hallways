@@ -20,7 +20,7 @@ class Fingerprint(object):
     def summarize(self):
         '''Summarizes the object as a dict for transfer'''
         data = {
-            "x": self._loc.x, "y": self._loc.y, "z": self._loc.z,
+            "x": float(self._loc.x), "y": float(self._loc.y), "z": float(self._loc.z),
             "n": self._accumulator.n,
             "stddev": self._accumulator.stddev,
             "avg": self._accumulator.avg,
@@ -30,3 +30,5 @@ class Fingerprint(object):
 
     def __str__(self):
         return '{0} = {1!s}'.format(self._BSSID, self._accumulator.avg)
+
+__all__ = ['Fingerprint']
