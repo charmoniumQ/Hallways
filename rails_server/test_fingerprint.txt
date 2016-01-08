@@ -1,24 +1,31 @@
+# not JSON
 <= random text
 => {"status":1,"error":"Invalid JSON format"}
 
+# wrong username
 <= {"username": "mainf", "token": "TOKEN"}
 => {"status":2,"error":"Invalid authentication"} (after about 500 ms)
 
+# wrong token
 <= {"username": "main", "token": "wrong token"}
 => {"status":2,"error":"Invalid authentication"} (after about 500 ms)
 
+# no fingerprint JSON
 <= {"username": "main", "token": "TOKEN"}
 => {"status":3,"error":"Invalid fingerprint JSON"} (also server log)
 
-<= {"username": "main", "token": "TOKEN", "fingerprint": {"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"}}
+# all correct
+<= {"username": "main", "token": "TOKEN", "fingerprints": [{"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"}]}
 => {"status":0} (also database should have this now)
 
-<= {"username": "main", "token": "TOKEN", "fingerprint": {"xfwef": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"}}
+# missing param
+<= {"username": "main", "token": "TOKEN", "fingerprints": [{"y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"}]}
 => {"status":3,"error":"Invalid fingerprint JSON"} (also server log)
 
-<= {"username": "main", "token": "TOKEN", "fingerprint": {"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle", "whefli": "wehlf"}}
+# extra param
+<= {"username": "main", "token": "TOKEN", "fingerprints": [{"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle", "whefli": "wehlf"}]}
 => {"status":3,"error":"Invalid fingerprint JSON"} (also server log)
 
-
-<= {"username": "main", "token": "TOKEN", "fingerprint": {"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"}}
+# one valid fingerprint one invalid fingerprint
+<= {"username": "main", "token": "TOKEN", "fingerprints": [{"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle"}, {"x": 0.1, "y": 0.2, "z": 0.3, "n": 100, "stddev": 2, "avg": 40, "bssid": "awle", "whefli": "wehlf"}]}
 => {"status":3,"error":"Invalid fingerprint JSON"} (also server log)

@@ -10,11 +10,11 @@ class Connection(object):
         self._token = token
         self._url = url
 
-    def upload(self, fingerprint):
+    def upload(self, fingerprints):
         data = {
             "username": self._username,
             "token": self._token,
-            "fingerprint": fingerprint.summarize()
+            "fingerprints": [fingerprint.summarize() for fingerprint in fingerprints]
         }
         resp = requests.post(self._url + 'upload', data=json.dumps(data))
         resp = json.loads(resp.text)
