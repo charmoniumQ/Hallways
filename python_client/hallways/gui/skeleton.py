@@ -10,19 +10,20 @@ class Skeleton(QWidget):
     '''Barebons skeleton of the application (interface without functionality)'''
     
     def __init__(self):
-        super().__init__()
+        QWidget.__init__(self)
         self.setGeometry(300, 300, 300, 220)
 
-        moving = QPushButton('Record data')
-        moving.setCheckable(True)
-        moving.clicked[bool].connect(self.record_state_changed)
+        self.moving = QPushButton('Record data')
+        self.moving.setCheckable(True)
+        self.moving.clicked[bool].connect(self.record_state_changed)
 
-        wmap = VisualMap(image)
-        wmap.get_point(self.handle_point)
+        self.wmap = VisualMap(image)
+        self.wmap.get_point(self.handle_point)
+        self.set_enable_point(True)
 
-        vbox = QVBoxLayout(self)
-        vbox.addWidget(moving)
-        vbox.addWidget(wmap)
+        self.vbox = QVBoxLayout(self)
+        self.vbox.addWidget(self.moving)
+        self.vbox.addWidget(self.wmap)
 
         self.show()
 
@@ -34,12 +35,19 @@ class Skeleton(QWidget):
         '''Called whenever a user enters in a point (override in subclass)'''
         print('User entered:', x, y)
 
-    def highlight_point(self, x, y):
+    def highlight_point(self, x, y, color='red'):
         '''Shows this point on the map to the user (call from subclass)'''
-        self.wmap.render_point(x, y, 'green')
+        self.wmap.render_point(x, y, color)
+
+    def set_enable_record(self, enable):
+        self.moving.setEnabled(enable)
+
+    def set_enable_point(self, enable):
+        self.wmap.enable = enable
+
+__all__ = ['Skeleton']
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     ex = Skeleton()
     sys.exit(app.exec_())
-

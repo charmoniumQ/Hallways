@@ -23,6 +23,8 @@ class ContinuousStats(object):
 
     @property
     def stddev(self):
+        if self._n == 0:
+            return 0
         return np.sqrt(self._S / self._n)
 
     @property

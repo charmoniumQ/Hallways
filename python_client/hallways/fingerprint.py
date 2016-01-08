@@ -27,3 +27,6 @@ class Fingerprint(object):
             "bssid": self._BSSID
         }
         return data
+
+    def __str__(self):
+        return '{0} = {1!s}'.format(self._BSSID, self._accumulator.avg)
