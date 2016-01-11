@@ -11,11 +11,11 @@ class Skeleton(QWidget):
     
     def __init__(self):
         QWidget.__init__(self)
-        self.setGeometry(300, 300, 300, 220)
+        #self.setGeometry(300, 300, 300, 220)
 
         self.moving = QPushButton('Record data')
         self.moving.setCheckable(True)
-        self.moving.clicked[bool].connect(self.record_state_changed)
+        self.moving.clicked[bool].connect(self._record_state_changed)
 
         self.wmap = VisualMap(image)
         self.wmap.get_point(self.handle_point)
@@ -27,23 +27,49 @@ class Skeleton(QWidget):
 
         self.show()
 
-    def record_state_changed(self, record):
+    def _record_state_changed(self, record):
         '''Called whenever "Record data" button is toggled (override in subclass)'''
-        print('Start' if record else 'Stop', 'recording data')
+        if record:
+            self.start_recording()
+        else:
+            self.stop_recording()
+
+    def start_recording(self):
+        '''Called whenever "Record data" button is pressed down (override in subclass)'''
+        print('Start recording')
+
+    def stop_recording(self):
+        '''Called whenever "Record data" button is pressed up (override in subclass)'''
+        print('Stop recording')
 
     def handle_point(self, x, y):
         '''Called whenever a user enters in a point (override in subclass)'''
         print('User entered:', x, y)
+        if hasattr(self, 'p'):
+            self.p.remove()
+        self.p, = self.highlight_point(x, y, 'user_entered')
 
-    def highlight_point(self, x, y, color='red'):
+    def highlight_point(self, x, y, style):
         '''Shows this point on the map to the user (call from subclass)'''
-        self.wmap.render_point(x, y, color)
+        styles = {
+            'user_entered': dict(color='green', marker='+', markersize=10, markeredgewidth=3),
+            'user_submitted': dict(color='red', marker='+', markersize=10, markeredgewidth=3),
+            'downloaded': dict(color='blue', marker='o', markersize=5),
+        }
+        if style in styles:
+            style_opts = styles[style]
+        else:
+            style_opts = style
+        return self.wmap.plot(x, y, **style_opts)
 
     def set_enable_record(self, enable):
         self.moving.setEnabled(enable)
 
     def set_enable_point(self, enable):
         self.wmap.enable = enable
+
+    def update(self):
+        self.wmap.update()
 
 __all__ = ['Skeleton']
 

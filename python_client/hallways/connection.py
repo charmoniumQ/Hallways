@@ -7,7 +7,10 @@ DEFAULT_FILE = '../resources/private/password.txt'
 class Connection(object):
     '''Represents a connection to the Hallways server that you can input and output data'''
 
-    def __init__(self, url='http://localhost:3000/', username=None, token=None, file_name=None):
+    def __init__(self, url='http://localhost:3000/', username=None, token=None, file_name=None, mock=False):
+        self.mock = mock
+        if self.mock:
+            return
         if not (username and token):
             # if username and token not supplied, try the file
             if not file_name and not os.getcwd().endswith('python_client'):
@@ -22,6 +25,8 @@ class Connection(object):
         self._url = url
 
     def upload(self, fingerprints):
+        if self.mock:
+            return
         data = {
             "username": self._username,
             "token": self._token,
@@ -33,6 +38,8 @@ class Connection(object):
             raise HallwaysServerException(resp['error'] if 'error' in resp else 'No message given')
 
     def download(self):
+        if self.mock:
+            return {}
         data = {
             "username": self._username,
             "token": self._token,

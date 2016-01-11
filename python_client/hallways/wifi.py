@@ -8,13 +8,18 @@ from .fingerprint import Fingerprint
 from .exceptions import WiFiScannerException
 
 class WiFiScanner(object):
-    def __init__(self, interface, delay=2):
+    def __init__(self, interface, delay=2, mock=False):
         '''Create a scanner for wireless interface that rescans every delay seconds'''
+        self.mock = mock
+        if self.mock:
+            return
         self._interface = interface
         self._delay = delay
 
     def start_scanning(self, loc):
         '''Start collecting data, and remember that it was taken from location loc'''
+        if self.mock:
+            return
         self._loc = loc
         self._stopped = False
         self._data = {}
@@ -43,11 +48,15 @@ class WiFiScanner(object):
 
     def stop_scanning(self):
         '''Stops scanning and returns data as a dict of fingerprints'''
+        if self.mock:
+            return {}
         self._stopped = True
         with self._data_lock:
             return self._data.copy()
 
     def join(self):
+        if self.mock:
+            return
         self._thread.join()
 
 def scan(interface):

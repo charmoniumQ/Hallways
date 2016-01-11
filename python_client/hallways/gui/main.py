@@ -10,45 +10,55 @@ from ..connection import Connection
 
 interface = 'wlp3s0'
 delay = 5
+mock = True
 class Main(Skeleton):
     def __init__(self):
         Skeleton.__init__(self)
-        self._scanner = WiFiScanner(interface, delay)
+        # core components
+        self._scanner = WiFiScanner(interface, delay, mock=mock)
+        self._c = Connection(mock=mock)
+
+        # UI place holders
         self._input_point = np.array([])
+        self._input_point_marker = None
         self.set_enable_record(False)
-        self._c = Connection()
 
-    def record_state_changed(self, record):
-        '''Called whenever "Record data" button is toggled (override in subclass)
-
-        Needs to either start collecting data or stop collecting data'''
+    def start_recording(self):
         if len(self._input_point) == 3:
-            # scan is either ready to go or already active
-            if record:
-                self._data = None # clear previous data
-                self._scanner.start_scanning(self._input_point)
-                print('Recording data from:', self._input_point)
+            self._data = None # clear previous scan data
+            self._scanner.start_scanning(self._input_point)
+            print('Recording data from:', self._input_point)
 
-                # UI changes
-                self.highlight_point(*self._input_point[:2], color='red')
-                self.set_enable_point(False)
-            else:
-                self._data = self._scanner.stop_scanning()
-                self._c.upload(self._data.values())
-                self._input_point = np.array([])
+            # UI changes
+            self._input_point_marker.remove()
+            self._input_point_marker, = self.highlight_point(*self._input_point[:2], style='user_submitted')
+            self.set_enable_point(False)
 
-                # UI changes
-                self.highlight_point(None, None)
-                self.set_enable_record(False)
-                self.set_enable_point(True)
-        else:
-            # can't fill request
-            pass
+    def stop_recording(self):
+        if len(self._input_point) == 3:
+            self._data = self._scanner.stop_scanning()
+            self._c.upload(self._data.values())
+
+            # UI changes
+            self._input_point = np.array([])
+            self._input_point_marker.remove()
+            self.update()
+            self._input_point_marker = None
+            self.set_enable_record(False)
+            self.set_enable_point(True)
 
     def handle_point(self, x, y):
         self._input_point = Location(x, y, 0)
         self.set_enable_record(True)
-        self.highlight_point(x, y, color='green')
+        if self._input_point_marker:
+            self._input_point_marker.remove()
+            self._input_point_marker = None
+        self._input_point_marker, = self.highlight_point(x, y, 'user_entered')
+
+    def reset_image(self):
+        # calls self.wmap.reset_image() to delete changes that were temporary
+        # but also reapplies changes that need to peresist
+        self.wmap.reset_image()
 
     def join(self):
         self._scanner.stop_scanning()
