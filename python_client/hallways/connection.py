@@ -32,8 +32,8 @@ class Connection(object):
             "token": self._token,
             "fingerprints": [fingerprint.summarize() for fingerprint in fingerprints]
         }
-        resp = requests.post(self._url + 'upload', data=json.dumps(data))
-        resp = json.loads(resp.text)
+        http_resp = requests.post(self._url + 'upload', data=json.dumps(data))
+        resp = json.loads(http_resp.text)
         if resp['status'] != 0:
             raise HallwaysServerException(resp['error'] if 'error' in resp else 'No message given')
 
@@ -44,8 +44,8 @@ class Connection(object):
             "username": self._username,
             "token": self._token,
         }
-        resp = requests.post(self._url + 'download', data=json.dumps(data))
-        resp = json.loads(resp.text)
+        http_resp = requests.post(self._url + 'download', data=json.dumps(data))
+        resp = json.loads(http_resp.text)
         if resp['status'] != 0:
             raise HallwaysServerException(resp['error'] if 'error' in resp else 'No message given')
         return resp['data']

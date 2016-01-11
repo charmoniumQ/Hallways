@@ -12,6 +12,7 @@ class VisualMap(QWidget):
     def __init__(self, image_source):
         QWidget.__init__(self)
         # http://stackoverflow.com/questions/12459811/how-to-embed-matplotib-in-pyqt-for-dummies
+        # http://matplotlib.org/examples/user_interfaces/embedding_in_qt4.html
         self._image = mpimg.imread(image_source)
         self._figure = Figure(figsize=(5, 5), frameon=False)
         self._canvas = FigureCanvas(self._figure)

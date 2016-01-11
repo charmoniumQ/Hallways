@@ -17,12 +17,16 @@ class Skeleton(QWidget):
         self.moving.setCheckable(True)
         self.moving.clicked[bool].connect(self._record_state_changed)
 
+        self.download = QPushButton('Download data')
+        self.download.clicked.connect(self._download_data) # indirectly called for polymorphism
+
         self.wmap = VisualMap(image)
         self.wmap.get_point(self.handle_point)
         self.set_enable_point(True)
 
         self.vbox = QVBoxLayout(self)
         self.vbox.addWidget(self.moving)
+        self.vbox.addWidget(self.download)
         self.vbox.addWidget(self.wmap)
 
         self.show()
@@ -42,24 +46,31 @@ class Skeleton(QWidget):
         '''Called whenever "Record data" button is pressed up (override in subclass)'''
         print('Stop recording')
 
+    def _download_data(self):
+        self.download_data()
+
+    def download_data(self):
+        '''Called whenever "Download data" is pressed (override in subclass)'''
+        print('Download data now')
+
     def handle_point(self, x, y):
         '''Called whenever a user enters in a point (override in subclass)'''
         print('User entered:', x, y)
         if hasattr(self, 'p'):
             self.p.remove()
-        self.p, = self.highlight_point(x, y, 'user_entered')
+        self.p, = self.highlight_point(x, y, 'downloaded')
 
     def highlight_point(self, x, y, style):
         '''Shows this point on the map to the user (call from subclass)'''
         styles = {
             'user_entered': dict(color='green', marker='+', markersize=10, markeredgewidth=3),
             'user_submitted': dict(color='red', marker='+', markersize=10, markeredgewidth=3),
-            'downloaded': dict(color='blue', marker='o', markersize=5),
+            'downloaded': dict(color='blue', marker='o', markersize=5, markeredgewidth=0, linestyle=''),
         }
-        if style in styles:
+        try:
             style_opts = styles[style]
-        else:
-            style_opts = style
+        except KeyError:
+            raise KeyError('style must be one of the following strings: ' + ', '.join(styles.keys()))
         return self.wmap.plot(x, y, **style_opts)
 
     def set_enable_record(self, enable):

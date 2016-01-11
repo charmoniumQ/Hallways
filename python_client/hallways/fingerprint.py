@@ -28,7 +28,20 @@ class Fingerprint(object):
         }
         return data
 
+    def readonly_copy(self):
+        return FingerprintRO(self.summarize().copy())
+
     def __str__(self):
         return '{0} = {1!s}'.format(self._BSSID, self._accumulator.avg)
+
+class FingerprintRO(object):
+    def __init__(self, data):
+        self._data = data
+    def summarize(self):
+        return self._data
+    def readonly_copy(self):
+        return FingerprintRO(self.summarize().copy())
+    def __str__(self):
+        return '{0} = {1!s}'.format(self._data['bssid'], self._data['avg'])
 
 __all__ = ['Fingerprint']

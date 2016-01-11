@@ -9,7 +9,7 @@ from hallways import WiFiScanner
 from hallways.wifi import scan
 
 class WiFiTest(unittest.TestCase):
-    def tes_scan(self):
+    def test_scan(self):
         try:
             slist = scan('wlp3s0')
         except WiFiScannerException as e:
@@ -21,9 +21,9 @@ class WiFiTest(unittest.TestCase):
     def test_continuous_scan(self):
         w = WiFiScanner('wlp3s0', delay=3)
         w.start_scanning(Location(0, 3, 4))
-        time.sleep(25)
+        time.sleep(20)
         data = w.stop_scanning()
-        for BSSID, f in data.items():
-            out = BSSID, f._accumulator.n, f._accumulator.avg, f._accumulator.stddev
+        for f in data:
+            out = f._data['bssid'], f._data['n'], f._data['avg'], f._data['stddev']
             print('{0: <12} {1:3d} {2:2.3f} {3:2.3f}'.format(*out))
         w.join()
