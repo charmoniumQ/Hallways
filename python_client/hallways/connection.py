@@ -41,6 +41,6 @@ class Connection(object):
         resp = json.loads(resp.text)
         if resp['status'] != 0:
             raise HallwaysServerException(resp['error'] if 'error' in resp else 'No message given')
-        return resp['response']
+        return resp['data']
 
 __all__ = ['Connection']

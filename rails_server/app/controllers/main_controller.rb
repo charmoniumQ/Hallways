@@ -28,14 +28,18 @@ class MainController < ApplicationController
   def download
     handle_error do
       update_response(nil) unless defined? @@response
-      render json: {'status': 0, 'response': @@response}
+      render json: {'status': 0, 'data': @@response.to_json}
     end
   end
 
   def update_response(new_fingerprint)
-    @@response = {'quantity': 0}
-    Fingerprint.find_each do |f|
-      @@response[:quantity] += 1      
+    if new_fingerprint.nil?
+      @@response = []
+      Fingerprint.find_each do |f|
+        update_response(f)
+      end
+    else
+      @@response << {'x': f.x, 'y': f.y, 'z': f.z, 'avg': f.avg}
     end
   end
 end
