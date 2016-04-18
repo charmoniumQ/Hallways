@@ -1,47 +1,65 @@
+import collections
 import json
-import numpy as np
-from .mystats import ContinuousStats
+from .location import Location
+import numpy
+# TODO: use continuous stats or not if it doesn't help performance that much
+#from .mystats import ContinuousStats
 
-class Fingerprint(object):
-    '''Represents data of WiFi signal-strength for a single AP names. I haven't worked out all of the details of this class. This needs to be filled with attributes that will be decided later.'''
+class Fingerprint(collections.namedtuple('Fingerprint', ['x', 'y', 'z', 'n', 'networks'])):
+    '''Represetns the data of WiFi signal-strengths from a particular location.
 
-    def __init__(self, BSSID, loc):
-        '''Builds a fingerprint for BSSID at loc'''
-        self._BSSID = BSSID
-        self._loc = loc
-        self._RSSIs = []
-        self._accumulator = ContinuousStats()
-
-    def update(self, RSSI):
-        '''Updates the fingerprint with the current RSSI readings'''
-        self._RSSIs.append(RSSI)
-        self._accumulator.update(RSSI)
-
+self.networks should be a dict of {BSSID: {m: <number of times presence detected>, strength_avg: <avg over signal strength>, strength_stddev: <stddev over strength>}}'''
     def summarize(self):
         '''Summarizes the object as a dict for transfer'''
-        data = {
-            "x": float(self._loc.x), "y": float(self._loc.y), "z": float(self._loc.z),
-            "n": self._accumulator.n,
-            "stddev": self._accumulator.stddev,
-            "avg": self._accumulator.avg,
-            "bssid": self._BSSID
-        }
-        return data
+        return dict(self._asdict()) # since self._asdict() -> OrderedDict
 
-    def readonly_copy(self):
-        return FingerprintRO(self.summarize().copy())
+    @property
+    def loc(self):
+        return Location(self.x, self.y, self.z)
 
     def __str__(self):
-        return '{0} = {1!s}'.format(self._BSSID, self._accumulator.avg)
+        return '\n'.join([
+            '{BSSID} = {strength_avg:.2f} +/- {strength_stddev:.2f}  with  {m:d} / {n:d} presence'.format(n=self.n, BSSID=BSSID, **self.networks[BSSID])
+            for BSSID in self.networks.keys()
+        ])
 
-class FingerprintRO(object):
-    def __init__(self, data):
-        self._data = data
-    def summarize(self):
-        return self._data
-    def readonly_copy(self):
-        return FingerprintRO(self.summarize().copy())
+class WriteableFingerprint(object):
+    '''Represents data of WiFi gathered from a single point at a single time from multiple trials for multiple BSSIDs.'''
+
+    def __init__(self, loc):
+        '''Builds a fingerprint taken at loc'''
+        self.x, self.y, self.z = loc[0], loc[1], loc[2]
+        self._networks_strengths = collections.defaultdict(list)
+        self._n = 0
+
+    def update(self, data):
+        '''Updates the fingerprint with the current trial.
+
+data should be a list of tuples whose first element is BSSID and second is strength at this trial.
+BSSID should be unique within one data.'''
+        self._n += 1
+        for BSSID, strength in data:
+            self._networks_strengths[BSSID].append(strength)
+
+    def finalize(self):
+        '''Take a snapshot of this object for transfer'''
+        networks = {}
+        for BSSID in self._networks_strengths.keys():
+            networks[BSSID] = {
+                "m": len(self._networks_strengths[BSSID]),
+                "strength_avg": numpy.average(self._networks_strengths[BSSID]),
+                "strength_stddev": numpy.std(self._networks_strengths[BSSID])
+            }
+        return Fingerprint(x=self.x, y=self.y, z=self.z, n=self._n, networks=networks)
+
+    @property
+    def loc(self):
+        return Location(self.x, self.y, self.z)
+
+    def __len__(self):
+        return self._n
+
     def __str__(self):
-        return '{0} = {1!s}'.format(self._data['bssid'], self._data['avg'])
+        return str(self.finalize())
 
-__all__ = ['Fingerprint']
+__all__ = ['Fingerprint', 'WriteableFingerprint']

@@ -3,11 +3,12 @@ import numpy as np
 class Location(np.ndarray):
     '''Class for containing a location in 3D space'''
 
+    # TODO: make this hashable
     def __new__(cls, x, y, z, *args, **kwargs):
         if 'shape' in kwargs:
             raise ValueError('You cannot set the shape of a location array')
         if 'dtype' not in kwargs:
-            kwargs['dtype'] = np.float128
+            kwargs['dtype'] = np.int32
         obj = np.ndarray.__new__(cls, shape=(3,), *args, **kwargs)
         obj[0] = x
         obj[1] = y

@@ -21,9 +21,7 @@ class WiFiTest(unittest.TestCase):
     def test_continuous_scan(self):
         w = WiFiScanner('wlp3s0', delay=3)
         w.start_scanning(Location(0, 3, 4))
-        time.sleep(20)
-        data = w.stop_scanning()
-        for f in data:
-            out = f._data['bssid'], f._data['n'], f._data['avg'], f._data['stddev']
-            print('{0: <12} {1:3d} {2:2.3f} {3:2.3f}'.format(*out))
+        time.sleep(5)
+        fingerprint = w.stop_scanning()
+        print(fingerprint)
         w.join()
