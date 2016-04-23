@@ -44,6 +44,7 @@ BSSID should be unique within one data.'''
     def finalize(self):
         '''Take a snapshot of this object for transfer'''
         networks = {}
+        print(self._networks_strengths)
         for BSSID in self._networks_strengths.keys():
             networks[BSSID] = {
                 "m": len(self._networks_strengths[BSSID]),

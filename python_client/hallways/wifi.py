@@ -4,6 +4,7 @@ import time
 import threading
 import re
 import sh
+from sys import platform as _platform
 #from wifi import Cell
 from .fingerprint import Fingerprint, WriteableFingerprint
 from .exceptions import WiFiScannerException
@@ -63,7 +64,7 @@ class WiFiScanner(object):
                 t = time.time() - self._last_time if self._last_time else None
                 self._last_time = time.time()
                 # TODO: remove print statements maybe? communicate status some other way
-                print('Updating',  't = {:.2f}'.format(t) if t else 't = NaN', 'n = {}'.format(len(self._fingerprint)))
+                print('Updating',  't = {:.2f}'.format(t) if t else 't = NaN', 'len(networks) = {}'.format(len(self._fingerprint)))
             time.sleep(self._delay)
 
     def stop_scanning(self):
@@ -87,37 +88,54 @@ def scan_old(interface):
 
 # TODO: this is the level mocks should be implemented at,
 # not WiFiScanner
+
 def scan(interface):
     '''Gets the a list if networks and signal strength using iwlist'''
-    try:
-        output = sh.iwlist(interface, 'scanning')
-    except sh.ErrorReturnCode_255:
-        raise WiFiScannerException('Interface is busy')
-    BSSIDs = []
-    ESSIDs = []
-    RSSIs = []
-    BSSID_line = re.compile(r'Address: ([0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2})')
-    ESSID_line = re.compile(r'ESSID:"(.*)"')
-    RSSI_line = re.compile(r'Signal level=(-\d+)')
-    for line in output:
-        m = re.search(BSSID_line, line)
-        if m:
-            BSSIDs.append(m.group(1))
+    if _platform == "linux" or _platform == "linux2":
+        try:
+            output = sh.iwlist(interface, 'scanning')
+        except sh.ErrorReturnCode_255:
+            raise WiFiScannerException('Interface is busy')
+        BSSIDs = []
+        ESSIDs = []
+        RSSIs = []
+        BSSID_line = re.compile(r'Address: ([0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2}:[0-9A-F]{2})')
+        ESSID_line = re.compile(r'ESSID:"(.*)"')
+        RSSI_line = re.compile(r'Signal level=(-\d+)')
+        for line in output:
+            m = re.search(BSSID_line, line)
+            if m:
+                BSSIDs.append(m.group(1))
+                continue
+            m = re.search(RSSI_line, line)
+            if m:
+                RSSIs.append(int(m.group(1)))
+                continue
+            m = re.search(ESSID_line, line)
+            if m:
+                ESSIDs.append(m.group(1))
+                if len(BSSIDs) != len(RSSIs) or len(BSSIDs) != len(ESSIDs):
+                    print(BSSIDs)
+                    print(RSSIs)
+                    print(ESSIDs)
+                    raise WiFiScannerException('Mismatch between BSSIDs and RSSIs')
             continue
-        m = re.search(RSSI_line, line)
-        if m:
-            RSSIs.append(int(m.group(1)))
-            continue
-        m = re.search(ESSID_line, line)
-        if m:
-            ESSIDs.append(m.group(1))
-            if len(BSSIDs) != len(RSSIs) or len(BSSIDs) != len(ESSIDs):
-                print(BSSIDs)
-                print(RSSIs)
-                print(ESSIDs)
-                raise WiFiScannerException('Mismatch between BSSIDs and RSSIs')
-            continue
-    return zip(BSSIDs, ESSIDs, RSSIs)
+        return zip(BSSIDs, ESSIDs, RSSIs)
+    elif _platform == "darwin":
+        output = sh.command(r'/System/Library/PrivateFrameworks/Apple80211.framework/Versions/A/Resources/airport', '-s')
+        BSSIDs = []
+        ESSIDs = []
+        RSSIs = []
+        for line in output:
+            match = re.search(r'\s*(.*) ([0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}) (-?\d{1,2})', line)
+            if match:
+                ESSIDs.append(match.group(1))
+                BSSIDs.append(match.group(2))
+                RSSIs.append(int(match.group(3)))
+        return zip(BSSIDs, ESSIDs, RSSIs)
+    elif _platform == "win32":
+        # Windows...
+        pass
 
 mock_scan_data = [
     Fingerprint(
