@@ -1,4 +1,3 @@
-from __future__ import print_function
 import sys
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import *
@@ -7,58 +6,77 @@ from .visual_map import VisualMap
 image = r'../resources/maps/Engineering and Computer Science South/ECSS4.png'
 
 class Skeleton(QWidget):
-    '''Barebons skeleton of the application (interface without functionality)'''
+    '''Barebones skeleton of the application (interface without functionality)'''
     
     def __init__(self):
         QWidget.__init__(self)
         #self.setGeometry(300, 300, 300, 220)
 
-        self.moving = QPushButton('Record data')
-        self.moving.setCheckable(True)
-        self.moving.clicked[bool].connect(self._record_state_changed)
+        self.moving_btn = QPushButton('Record data')
+        self.moving_btn.setCheckable(True)
+        self.moving_btn.clicked[bool].connect(self._record_state_changed)
 
-        self.download = QPushButton('Download data')
-        self.download.clicked.connect(self._download_data) # indirectly called for polymorphism
+        self.log_elem = QTextEdit()
+        self.log_elem.setReadOnly(True)
+        font = self.log_elem.font()
+        font.setFamily("Courier")
+        font.setPointSize(10)
+        self.sb = self.log_elem.verticalScrollBar()
 
         self.wmap = VisualMap(image)
-        self.wmap.get_point(self.handle_point)
-        self.set_enable_point(True)
+        self.wmap.set_callback(self.handle_point)
 
         self.vbox = QVBoxLayout(self)
-        self.vbox.addWidget(self.moving)
-        self.vbox.addWidget(self.download)
+        self.vbox.addWidget(self.moving_btn)
+        self.vbox.addWidget(self.log_elem)
         self.vbox.addWidget(self.wmap)
 
         self.show()
 
     def _record_state_changed(self, record):
-        '''Called whenever "Record data" button is toggled (override in subclass)'''
+        '''Called whenever "Record data" button is toggled'''
         if record:
-            self.start_recording()
+            if self.point:
+                self.with_location = True
+                self.start_recording_with_location(*self.point)
+            else:
+                self.with_location = False
+                self.start_recording_without_location()
         else:
-            self.stop_recording()
+            if self.with_location:
+                self.stop_recording_with_location()
+                self.wmap.clear()
+                self.point = None
+            else:
+                self.stop_recording_without_location()
 
-    def start_recording(self):
-        '''Called whenever "Record data" button is pressed down (override in subclass)'''
-        print('Start recording')
+    def start_recording_with_location(self, x, y):
+        '''Called whenever "Record data" button is pressed down and a point is selected (override in subclass)'''
+        self.log('Start recording from ({x:d}, {y:d})'.format(**locals()))
 
-    def stop_recording(self):
-        '''Called whenever "Record data" button is pressed up (override in subclass)'''
-        print('Stop recording')
+    def start_recording_without_location(self):
+        '''Called whenever "Record data" button is pressed down and no point is selected (override in subclass)'''
+        self.log('Start recording')
 
-    def _download_data(self):
-        self.download_data()
+    def stop_recording_with_location(self):
+        '''Called whenever "Record data" button is pressed up and a point was selected (override in subclass)'''
+        self.log('Stop recording with location')
 
-    def download_data(self):
-        '''Called whenever "Download data" is pressed (override in subclass)'''
-        print('Download data now')
+    def stop_recording_without_location(self):
+        '''Called whenever "Record data" button is pressed up and no point was selected (override in subclass)'''
+        self.log('Stop recording')
 
-    def handle_point(self, x, y):
-        '''Called whenever a user enters in a point (override in subclass)'''
-        print('User entered:', x, y)
-        if hasattr(self, 'p'):
-            self.p.remove()
-        self.p, = self.highlight_point(x, y, 'downloaded')
+    def handle_point(self, x, y, button):
+        if button == 1:
+            x, y = int(x), int(y)
+            self.log('User entered: ({x}, {y})'.format(**locals()))
+            self.wmap.clear()
+            self.point = [x, y]
+            self.highlight_point(x, y, 'user_entered')
+        else:
+            self.log('Clear screen')
+            self.wmap.clear()
+            self.point = None
 
     def highlight_point(self, x, y, style):
         '''Shows this point on the map to the user (call from subclass)'''
@@ -73,14 +91,10 @@ class Skeleton(QWidget):
             raise KeyError('style must be one of the following strings: ' + ', '.join(styles.keys()))
         return self.wmap.plot(x, y, **style_opts)
 
-    def set_enable_record(self, enable):
-        self.moving.setEnabled(enable)
-
-    def set_enable_point(self, enable):
-        self.wmap.enable = enable
-
-    def update(self):
-        self.wmap.update()
+    def log(self, message, end='\n'):
+        self.log_elem.moveCursor(QTextCursor.End)
+        self.log_elem.insertPlainText(message + end)
+        self.sb.setValue(self.sb.maximum())
 
 __all__ = ['Skeleton']
 

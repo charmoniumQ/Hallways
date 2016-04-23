@@ -44,18 +44,19 @@ class VisualMap(QWidget):
         self._canvas.draw()
         return p
 
-    def get_point(self, callback):
+    def set_callback(self, callback):
         self._callback = callback
 
     def mouse_pressed(self, event):
-        if self.enable and self._callback:
+        if self.enable:
             x, y = event.xdata, event.ydata
             if x and y and 0 <= x < self._image.shape[1] and 0 <= y < self._image.shape[0]:
-                self._callback(x, y)
+                if self._callback:
+                    self._callback(x, y, button=event.button)
         else:
             event.ignore()
 
-    def update(self):
-        self._canvas.draw()
+    def clear(self):
+       self._reset_image()
 
 __all__ = ['VisualMap']

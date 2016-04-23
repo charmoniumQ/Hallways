@@ -7,76 +7,39 @@ from ..wifi import WiFiScanner
 from ..location import Location
 from ..connection import Connection
 
+# TODO: GUI for these settings
 interface = 'wlp3s0'
 delay = 5
-mock = False
-network_names = ['CometNet']
+mock_network = True
+mock_wifi = False
+#network_names = ['CometNet']
+network_names = None
+
 class Main(Skeleton):
     def __init__(self):
         Skeleton.__init__(self)
         # core components
-        self._scanner = WiFiScanner(interface, delay, network_names=network_names, mock=mock)
-        self._c = Connection(mock=mock)
+        self._scanner = WiFiScanner(interface, delay, network_names=network_names, mock=mock_wifi)
+        self._con = Connection(mock=mock_network)
 
-        # UI place holders
-        self._input_point = np.array([])
-        self._input_point_marker = None
-        self.set_enable_record(False)
-        self._downloaded = None
+    def start_recording_with_location(self, x, y):
+        self.log('Start collecting data from ({x:d}, {y:d})'.format(**locals()))
+        self._scanner.start_scanning(Location(x, y, 0))
 
-    def start_recording(self):
-        if len(self._input_point) == 3:
-            self._data = None # clear previous scan data
-            self._scanner.start_scanning(self._input_point)
-            print('Recording data from:', self._input_point)
+    def start_recording_without_location(self):
+        self.log('Start collecting data without location')
+        self._scanner.start_scanning(Location(0, 0, 0))
 
-            # UI changes
-            self._input_point_marker.remove()
-            self._input_point_marker, = self.highlight_point(*self._input_point[:2], style='user_submitted')
-            self.set_enable_point(False)
+    def stop_recording_with_location(self):
+        self.log('Stopping scanning')
+        data = self._scanner.stop_scanning()
+        self.log('Uploading {n} data points of {j} networks'.format(n=data.n, j=len(data.networks)))
+        self._con.upload(data)
 
-    def stop_recording(self):
-        if len(self._input_point) == 3:
-            self._data = self._scanner.stop_scanning()
-            self._c.upload(self._data)
-
-            # UI changes
-            self._input_point = np.array([])
-            self._input_point_marker.remove()
-            self.update()
-            self._input_point_marker = None
-            self.set_enable_record(False)
-            self.set_enable_point(True)
-            self.download_data()
-
-    def download_data(self):
-        xs, ys = [], []
-        for f in self._c.download():
-            for x, y in zip(xs, ys):
-                if np.allclose([f['x'], f['y']], [x, y], atol=1):
-                    # if f.x and f.y are within 1 unit of x and y respectively
-                    break
-            else:
-                # for-loop not broken means data not close to any x, y, so data unique
-                xs.append(f['x'])
-                ys.append(f['y'])
-        print(xs, ys)
-        if self._downloaded:
-            # repeat render, change data
-            self._downloaded.set_xdata(xs)
-            self._downloaded.set_ydata(ys)
-        else:
-            # first time render
-            self._downloaded, = self.highlight_point(xs, ys, 'downloaded')
-        self.update()
-
-    def handle_point(self, x, y):
-        self._input_point = Location(x, y, 0)
-        self.set_enable_record(True)
-        if self._input_point_marker:
-            self._input_point_marker.remove()
-            self._input_point_marker = None
-        self._input_point_marker, = self.highlight_point(x, y, 'user_entered')
+    def stop_recording_without_location(self):
+        self.log('Stopping scanning')
+        data = self._scanner.stop_scanning()
+        self.log('Locating self with {n} data points of {j} networks'.format(n=data.n, j=len(data.networks)))
 
     def join(self):
         self._scanner.stop_scanning()
