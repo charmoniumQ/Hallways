@@ -4,11 +4,11 @@ class MainController < ApplicationController
   def upload
     handle_error do
       begin
-        if @req['fingerprints'].nil? or not @req['fingerprints'].kind_of?(Array)
+        if @req['fingerprints'].nil? or not @req['fingerprints'].kind_of? Array
           raise ArgumentError
         end
         model_objs = @req['fingerprints'].collect do |raw_obj|
-          model_obj = Fingerprint.new(raw_obj)
+          model_obj = Fingerprint.new raw_obj
           raise ArgumentError if model_obj.invalid?
           model_obj
         end
@@ -19,7 +19,7 @@ class MainController < ApplicationController
         model_objs.each do |f|
           f.save
         end
-        update_response(model_objs)
+        update_response model_objs
         render json: {'status': 0}
       end
     end
@@ -27,7 +27,7 @@ class MainController < ApplicationController
 
   def download
     handle_error do
-      update_response(nil) # ensures that the response exists
+      update_response nil # ensures that the response exists
       render json: {'status': 0, 'data': @@response}
     end
   end
@@ -36,7 +36,7 @@ class MainController < ApplicationController
     unless defined? @@response
       # build from scratch
       @@response = []
-      update_response(Fingerprint.find_each)
+      update_response Fingerprint.find_each
     end
     unless fs.nil?
       # build by modifying previous one to include fs

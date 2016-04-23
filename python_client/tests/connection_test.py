@@ -4,19 +4,14 @@ from hallways import Fingerprint, Location
 # Document under test
 from hallways import Connection
 
-class TestContinuousStats(unittest.TestCase):
+class TestConnection(unittest.TestCase):
     def test_connection(self):
-        c = Connection('http://localhost:3000/')
+        c = Connection('http://localhost:3000/', mock=True)
         c.download()
 
-        f1 = Fingerprint('test', Location(0, 41, 21))
-        f1.update(2.1)
-        f1.update(1.9)
-        f1.update(2.3)
+        f1 = Fingerprint(x=1, y=2, z=3, n=10, networks={
+            '00:11:22:33:44:55': dict(m=10, strength_avg=-75, strength_stddev=4),
+            '01:11:22:33:44:55': dict(m=10, strength_avg=-75, strength_stddev=4),
+        })
 
-        f2 = Fingerprint('test2', Location(0, 35, 23))
-        f2.update(20.4)
-        f2.update(20.1)
-        f2.update(19)
-
-        c.upload([f1, f2])
+        c.upload(f1)

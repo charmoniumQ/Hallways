@@ -18,17 +18,18 @@ class ApplicationController < ActionController::Base
 
   private
   def authenticate_user_from_token!
+    # TODO: don't implement this manually
     handle_error do
       t1 = Time.now
       @user = nil
-      if @req.has_key?('username') and @req.has_key?('token')
-        tmp = User.find_by(username: @req['username'])
+      if @req.has_key? 'username' and @req.has_key? 'token'
+        tmp = User.find_by username: @req['username']
         if not tmp.nil?
-          @user = tmp.authenticate(@req['token'])
+          @user = tmp.authenticate @req['token']
         end
       end
       if !@user
-        ensure_delay(t1, 0.5)
+        ensure_delay t1, 0.5
         # sleep for 0.5 seconds since t1 to prevent timing attacks
         # the time of exit would otherwise leak whether or not the username was found in the database
         # it also slows down DOS attacks and random guessing attacks
@@ -57,6 +58,6 @@ end
 def ensure_delay(t1, delay_time)
   t2 = Time.now
   if t1 - t2 + delay_time > 0
-    sleep(t1 - t2 + delay_time)
+    sleep t1 - t2 + delay_time
   end
 end

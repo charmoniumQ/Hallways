@@ -3,16 +3,14 @@ Python app
 
 ##### Part 1 #####
 
-- There is a map of campus
-- The user clicks on where he/she is
+- There is a map of a building
+- If the location is known, the user selects their location
 - When the user clicks "Record Data"
     * WiFi measurements are periodically taken
     * When the user clicks "Record Data"
         + The WiFi data collection stops
-        + If the user clicks "Send data", the data is sent to the server
-		+ If the user clicks "Where am I"
-            - All the WiFi data is downloaded from the server to the client
-			- The client attempts to locate itself on the map
+        + If the location is selected, the data is uploaded to the client authoritatively
+		+ If the location is not selected, the data is used to locate the user
 
 
 ##### Running #####

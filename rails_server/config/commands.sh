@@ -7,7 +7,7 @@ read -p "Change the gem file and press enter "
 # add devise, rails, bcrypt, and sqlite3
 bundle install
 
-rails generate model Fingerprint bssid:string x:float y:float z:float avg:float stddev:float n:integer
+rails generate model Fingerprint bssid:string x:float y:float z:float avg:float stddev:float n:integer, n:integer
 rails generate model User username:string password_digest:string
 rake db:drop db:create db:migrate
 

@@ -4,6 +4,7 @@ import time
 import threading
 import re
 import sh
+import numpy
 #from wifi import Cell
 from .fingerprint import Fingerprint, WriteableFingerprint
 from .exceptions import WiFiScannerException
@@ -12,10 +13,15 @@ from .exceptions import WiFiScannerException
 # it is more compact
 # TODO: use custom JSON decoder object hooks to make a string MAC address serialize to 6 bytes
 def mac_to_bytes(MAC):
-    MAC = MAC.replace(MAC[2], '')
-    if len(MAC) != 12:
-        # TODO: make this an exception from the exceptions module?
-        raise RuntimeError('Invalid MAC address')
+    '''Accepts any delimiter in the second index (usually a colon or dash) and returns a dict of index to bytes
+
+For example, mac_to_bytes('00:11:22:33:44:55') == {0: 0, 1: 17, 2: 34, 3: 51, 4: 68, 5: 85}'''
+    if re.match(MAC, '([0-9a-fA-F]{2}.){5}[0-9a-fA-F]{2}'):
+        MAC = MAC.replace(MAC[2], '')
+    elif re.match(MAC, '[0-9a-fA-F]{12}'):
+        pass
+    else:
+        raise RuntimeError('Invalid MAC address ' + repr(MAC))
     return dict(enumerate((bytes.fromhex(MAC))))
 
 class WiFiScanner(object):
@@ -32,6 +38,7 @@ class WiFiScanner(object):
         '''Start collecting data, and remember that it was taken from location loc'''
         if self.mock:
             return
+        # TODO: use pipe objects to transfer data instead of locks + primitive objects
         self._stopped = False
         self._data = {}
         self._data_lock = threading.Lock()
@@ -62,7 +69,7 @@ class WiFiScanner(object):
                 # TODO: this should be timedelta and datetime
                 t = time.time() - self._last_time if self._last_time else None
                 self._last_time = time.time()
-                # TODO: remove print statements maybe? communicate status some other way
+                # TODO: remove print statements, and pass status through interprocess pipe instead
                 print('Updating',  't = {:.2f}'.format(t) if t else 't = NaN', 'n = {}'.format(len(self._fingerprint)))
             time.sleep(self._delay)
 
@@ -121,12 +128,34 @@ def scan(interface):
 
 mock_scan_data = [
     Fingerprint(
-        x=3.0, y=2.0, z=6.0,
+        x=numpy.int32(3), y=numpy.int32(2), z=numpy.int32(6),
         n=20,
         networks={
             "what is a mac address": {"m": 19, "avg": 20, "stddev": 2}
         }
     ),
 ]
+mock_scan_data2 = {
+    "34:A8:4E:3B:B4:90": {
+        "m": 2,
+        "strength_stddev": 0.0,
+        "strength_avg": -62.0
+    },
+    "34:A8:4E:D2:AE:01": {
+        "m": 2,
+        "strength_stddev": 0.0,
+        "strength_avg": -63.0
+    },
+    "34:A8:4E:1E:73:B1": {
+        "m": 2,
+        "strength_stddev": 0.0,
+        "strength_avg": -59.0
+    },
+    "34:A8:4E:D2:A1:F1": {
+        "m": 2,
+        "strength_stddev": 0.0,
+        "strength_avg": -64.0
+    },
+}
 
 __all__ = ['WiFiScanner']

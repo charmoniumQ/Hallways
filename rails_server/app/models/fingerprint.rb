@@ -1,3 +1,4 @@
 class Fingerprint < ActiveRecord::Base
-  validates :x, :y, :z, :avg, :stddev, :n, :bssid, presence: true
+  has_many :networks
+  validates :x, :y, :z, :n, :bssid, presence: true
 end
