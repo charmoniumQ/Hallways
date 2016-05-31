@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QApplication
 from .skeleton import Skeleton
 from ..wifi import WiFiScanner
 from ..location import Location
-from ..connection import Connection
+from ..storage import FileStorageServer
 
 # TODO: GUI for these settings
 interface = 'wlp3s0'
@@ -20,7 +20,7 @@ class Main(Skeleton):
         Skeleton.__init__(self)
         # core components
         self._scanner = WiFiScanner(interface, delay, network_names=network_names, mock=mock_wifi)
-        self._con = Connection(mock=mock_network)
+        self._server = FileStorageServer("data.json", clear=True)
 
     def start_recording_with_location(self, x, y):
         self.log('Start collecting data from ({x:d}, {y:d})'.format(**locals()))
@@ -34,7 +34,7 @@ class Main(Skeleton):
         self.log('Stopping scanning')
         data = self._scanner.stop_scanning()
         self.log('Uploading {n} data points of {j} networks'.format(n=data.n, j=len(data.networks)))
-        self._con.upload(data)
+        self._server.upload(data)
 
     def stop_recording_without_location(self):
         self.log('Stopping scanning')
