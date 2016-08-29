@@ -42,6 +42,7 @@ self.networks should be a dict of {BSSID: NetworkRecord}'''
 
 class WriteableFingerprint(object):
     '''Represents data of WiFi gathered from a single point at a single time from multiple trials for multiple BSSIDs.'''
+    # TODO: rewrite this to capture ALL data
 
     def __init__(self, loc):
         '''Builds a fingerprint taken at loc'''

@@ -141,39 +141,9 @@ def scan(interface):
                 RSSIs.append(int(match.group(3)))
         return zip(BSSIDs, ESSIDs, RSSIs)
     elif _platform == "win32":
-        # Windows...
+        raise NotImplementedError('Windows is not yet supported')
         pass
 
-mock_scan_data = [
-    Fingerprint(
-        x=numpy.int32(3), y=numpy.int32(2), z=numpy.int32(6),
-        n=20,
-        networks={
-            "what is a mac address": {"m": 19, "avg": 20, "stddev": 2}
-        }
-    ),
-]
-mock_scan_data2 = {
-    "34:A8:4E:3B:B4:90": {
-        "m": 2,
-        "strength_stddev": 0.0,
-        "strength_avg": -62.0
-    },
-    "34:A8:4E:D2:AE:01": {
-        "m": 2,
-        "strength_stddev": 0.0,
-        "strength_avg": -63.0
-    },
-    "34:A8:4E:1E:73:B1": {
-        "m": 2,
-        "strength_stddev": 0.0,
-        "strength_avg": -59.0
-    },
-    "34:A8:4E:D2:A1:F1": {
-        "m": 2,
-        "strength_stddev": 0.0,
-        "strength_avg": -64.0
-    },
-}
+# TODO: add mock data
 
 __all__ = ['WiFiScanner']
