@@ -2,8 +2,7 @@
 
 from distutils.core import setup
 
-# TODO: what about this?
-
-setup(name='Hallways client',
-      version='1.0',
-     )
+setup(
+    name='Hallways client',
+    version='1.0',
+)
